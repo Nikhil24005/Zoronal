@@ -18,19 +18,8 @@ const rootEnvPath = path.resolve(__dirname, '..', '.env');
 
 dotenv.config({ path: rootEnvPath });
 
-const allowedOrigins = [
-  'https://zoronal-hazel.vercel.app',
-  'https://zoronal-ldmmc35xu-nikhilsharma7691-gmailcoms-projects.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'http://localhost:5174',
-  ...(process.env.CLIENT_ORIGIN || '').split(','),
-]
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: true,
   credentials: true,
 };
 
