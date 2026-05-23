@@ -8,6 +8,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import connectDB from './config/db.js';
+import apiRoutes from './routes/index.js';
 import companyRoutes from './routes/companyRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
@@ -19,7 +20,36 @@ const rootEnvPath = path.resolve(__dirname, '..', '.env');
 dotenv.config({ path: rootEnvPath });
 
 const corsOptions = {
-  origin: true,
+  origin(origin, callback) {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    const allowedExactOrigins = new Set([
+      'https://zoronal-hazel.vercel.app',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:5174',
+    ]);
+
+    let parsedOrigin;
+    try {
+      parsedOrigin = new URL(origin);
+    } catch {
+      callback(new Error(`CORS blocked for invalid origin: ${origin}`));
+      return;
+    }
+
+    const isVercelPreview = parsedOrigin.protocol === 'https:' && parsedOrigin.hostname.endsWith('.vercel.app');
+
+    if (allowedExactOrigins.has(origin) || isVercelPreview) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true,
 };
 
@@ -52,6 +82,7 @@ app.get('/', (req, res) => {
   });
 });
 
+app.use('/api', apiRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/reviews', reviewRoutes);
 
