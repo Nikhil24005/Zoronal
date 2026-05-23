@@ -80,7 +80,7 @@ app.use((req, res, next) => {
       return;
     }
 
-    res.sendStatus(204);
+    res.status(200).end();
     return;
   }
 
