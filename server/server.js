@@ -71,6 +71,7 @@ app.use((req, res, next) => {
       'Access-Control-Allow-Headers',
       req.headers['access-control-request-headers'] || 'Content-Type, Authorization, X-Requested-With',
     );
+    res.setHeader('Access-Control-Max-Age', '86400');
   }
 
   if (req.method === 'OPTIONS') {

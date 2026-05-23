@@ -6,7 +6,7 @@ if (!rawApiUrl) {
   throw new Error('Missing VITE_API_URL. Set it in your Vite environment files or deployment settings.');
 }
 
-const apiBaseUrl = rawApiUrl.trim().replace(/\/$/, '');
+const apiBaseUrl = `${rawApiUrl.trim().replace(/\/$/, '')}/api`;
 
 const http = axios.create({
   baseURL: apiBaseUrl,

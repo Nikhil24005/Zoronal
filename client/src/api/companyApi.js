@@ -1,7 +1,7 @@
 import axiosInstance from './axiosInstance';
 
 export async function createCompany(data) {
-  const response = await axiosInstance.post('/api/companies', data);
+  const response = await axiosInstance.post('/companies', data);
   return response.data;
 }
 
@@ -12,11 +12,11 @@ export async function getAllCompanies(search = '', page = 1, limit = 10) {
   params.append('limit', String(limit));
 
   const query = params.toString() ? `?${params.toString()}` : '';
-  const response = await axiosInstance.get(`/api/companies${query}`);
+  const response = await axiosInstance.get(`/companies${query}`);
   return response.data;
 }
 
 export async function getCompanyById(id) {
-  const response = await axiosInstance.get(`/api/companies/${id}`);
+  const response = await axiosInstance.get(`/companies/${id}`);
   return response.data;
 }
