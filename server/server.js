@@ -18,10 +18,38 @@ const rootEnvPath = path.resolve(__dirname, '..', '.env');
 
 dotenv.config({ path: rootEnvPath });
 
-const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:3000,http://localhost:5173,http://localhost:5174')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const defaultOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://zoronal-hazel.vercel.app',
+];
+
+const allowedOrigins = Array.from(
+  new Set(
+    [
+      ...(process.env.CLIENT_ORIGIN || '').split(','),
+      ...defaultOrigins,
+    ]
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+  ),
+);
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204,
+};
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -38,11 +66,9 @@ try {
 app.use('/uploads', express.static(uploadsDir));
 
 app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  }),
+  cors(corsOptions),
 );
+app.options('*', cors(corsOptions));
 app.use(helmet());
 // Allow larger JSON payloads for base64 image uploads (up to 12MB)
 app.use(express.json({ limit: '12mb' }));

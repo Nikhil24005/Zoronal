@@ -34,6 +34,30 @@ cd client
 npm run dev
 ```
 
+## Environment Variables
+
+Frontend (`client/.env.development` for local development and Vercel project variables for production):
+
+```bash
+VITE_API_URL=http://localhost:5000/api
+```
+
+Production frontend value on Vercel:
+
+```bash
+VITE_API_URL=https://zoronal-nnj6.onrender.com/api
+```
+
+Backend root `.env` for local development and Render environment variables for production:
+
+```bash
+MONGO_URI=your-mongodb-atlas-connection-string
+PORT=5000
+CLIENT_ORIGIN=http://localhost:3000,http://localhost:5173,http://localhost:5174,https://zoronal-hazel.vercel.app
+JWT_SECRET=your-long-random-secret
+NODE_ENV=production
+```
+
 ## Backend Endpoints
 
 - `GET /api/health` - API health check
@@ -42,6 +66,6 @@ npm run dev
 
 ## Notes
 
-- The frontend uses an Axios client with a Vite proxy to reach the backend during development.
+- The frontend uses a shared Axios client configured from `VITE_API_URL`.
 - The backend loads the root `.env` file automatically.
 "# Zoronal" 

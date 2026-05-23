@@ -1,10 +1,3 @@
-import axios from 'axios';
+import http from './http';
 
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-export default axiosInstance;
+export default http;
