@@ -39,13 +39,13 @@ npm run dev
 Frontend (`client/.env.development` for local development and Vercel project variables for production):
 
 ```bash
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000
 ```
 
 Production frontend value on Vercel:
 
 ```bash
-VITE_API_URL=https://zoronal-nnj6.onrender.com/api
+VITE_API_URL=https://zoronal-nnj6.onrender.com
 ```
 
 Backend root `.env` for local development and Render environment variables for production:
