@@ -4,7 +4,6 @@ import { promisify } from 'node:util';
 import dotenv from 'dotenv';
 import express from 'express';
 import fs from 'node:fs';
-import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import connectDB from './config/db.js';
@@ -19,39 +18,29 @@ const rootEnvPath = path.resolve(__dirname, '..', '.env');
 
 dotenv.config({ path: rootEnvPath });
 
-const corsOptions = {
-  origin(origin, callback) {
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
+const allowedExactOrigins = new Set([
+  'https://zoronal-hazel.vercel.app',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+]);
 
-    const allowedExactOrigins = new Set([
-      'https://zoronal-hazel.vercel.app',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:5174',
-    ]);
+function isAllowedOrigin(origin) {
+  if (!origin) {
+    return true;
+  }
 
-    let parsedOrigin;
-    try {
-      parsedOrigin = new URL(origin);
-    } catch {
-      callback(new Error(`CORS blocked for invalid origin: ${origin}`));
-      return;
-    }
+  let parsedOrigin;
+  try {
+    parsedOrigin = new URL(origin);
+  } catch {
+    return false;
+  }
 
-    const isVercelPreview = parsedOrigin.protocol === 'https:' && parsedOrigin.hostname.endsWith('.vercel.app');
+  const isVercelPreview = parsedOrigin.protocol === 'https:' && parsedOrigin.hostname.endsWith('.vercel.app');
 
-    if (allowedExactOrigins.has(origin) || isVercelPreview) {
-      callback(null, true);
-      return;
-    }
-
-    callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
-  credentials: true,
-};
+  return allowedExactOrigins.has(origin) || isVercelPreview;
+}
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -67,8 +56,36 @@ try {
 // Serve uploaded files
 app.use('/uploads', express.static(uploadsDir));
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (isAllowedOrigin(origin)) {
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
+
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      req.headers['access-control-request-headers'] || 'Content-Type, Authorization, X-Requested-With',
+    );
+  }
+
+  if (req.method === 'OPTIONS') {
+    if (!isAllowedOrigin(origin)) {
+      res.sendStatus(403);
+      return;
+    }
+
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
+
 app.use(helmet());
 // Allow larger JSON payloads for base64 image uploads (up to 12MB)
 app.use(express.json({ limit: '12mb' }));
