@@ -36,27 +36,22 @@ npm run dev
 
 ## Environment Variables
 
-Frontend (`client/.env.development` for local development and Vercel project variables for production):
-
-```bash
-VITE_API_URL=http://localhost:5000
-```
-
 Production frontend value on Vercel:
 
 ```bash
 VITE_API_URL=https://zoronal-nnj6.onrender.com
 ```
 
-Backend root `.env` for local development and Render environment variables for production:
+Production backend values on Render:
 
 ```bash
 MONGO_URI=your-mongodb-atlas-connection-string
-PORT=5000
-CLIENT_ORIGIN=http://localhost:3000,http://localhost:5173,http://localhost:5174,https://zoronal-hazel.vercel.app
+CLIENT_ORIGIN=https://zoronal-hazel.vercel.app
 JWT_SECRET=your-long-random-secret
 NODE_ENV=production
 ```
+
+If you want a separate local environment, keep `client/.env.development` set to your local API host during development.
 
 ## Backend Endpoints
 
